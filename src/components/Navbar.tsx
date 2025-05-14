@@ -4,6 +4,7 @@ import { useCart } from "../context/CartContext";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 interface NavbarProps {
   toggleSidebar: () => void;
@@ -13,6 +14,7 @@ interface NavbarProps {
 const Navbar = ({ toggleSidebar, toggleCart }: NavbarProps) => {
   const { cartCount } = useCart();
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   return (
     <div className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-sm border-b">
@@ -28,9 +30,9 @@ const Navbar = ({ toggleSidebar, toggleCart }: NavbarProps) => {
             <Menu className="h-6 w-6" />
           </Button>
           <div className="flex-shrink-0 flex items-center">
-            <span className="text-xl font-bold text-foodBrand">
+            <Link to="/" className="text-xl font-bold text-foodBrand">
               Tasty<span className="text-black">Dish</span>
-            </span>
+            </Link>
           </div>
         </div>
         
@@ -63,8 +65,8 @@ const Navbar = ({ toggleSidebar, toggleCart }: NavbarProps) => {
           </Button>
           
           <div className="hidden sm:flex gap-2">
-            <Button variant="outline">Sign In</Button>
-            <Button>Sign Up</Button>
+            <Button variant="outline" onClick={() => navigate("/signin")}>Sign In</Button>
+            <Button onClick={() => navigate("/signup")}>Sign Up</Button>
           </div>
         </div>
       </div>
