@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { menuItems } from '../data/menuData';
 import { useCart } from '../context/CartContext';
 import Navbar from '../components/Navbar';
@@ -13,14 +13,21 @@ const Index = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [filteredItems, setFilteredItems] = useState(menuItems);
 
   const toggleCart = () => setIsCartOpen(!isCartOpen);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  // Filter menu items based on the active category
-  const filteredItems = activeCategory === "all"
-    ? menuItems
-    : menuItems.filter(item => item.category === activeCategory);
+  // Update filtered items when activeCategory changes
+  useEffect(() => {
+    console.log("Active category changed to:", activeCategory);
+    if (activeCategory === "all") {
+      setFilteredItems(menuItems);
+    } else {
+      const filtered = menuItems.filter(item => item.category === activeCategory);
+      setFilteredItems(filtered);
+    }
+  }, [activeCategory]);
 
   // Get popular items for the featured section
   const popularItems = menuItems.filter(item => item.popular);
@@ -72,7 +79,8 @@ const Index = () => {
             {/* Menu Items */}
             <section>
               <h2 className="text-2xl font-bold mb-6">
-                {activeCategory === "all" ? "All Items" : filteredItems.length > 0 ? 
+                {activeCategory === "all" ? "All Items" : 
+                  filteredItems.length > 0 ? 
                   `${filteredItems[0].category.charAt(0).toUpperCase() + filteredItems[0].category.slice(1)}` : 
                   "Menu Items"}
               </h2>
