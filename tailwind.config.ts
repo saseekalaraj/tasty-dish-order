@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,10 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+                foodBrand: "#F97316",
+                foodAccent: "#FEC6A1",
+                foodLight: "#FEF7CD",
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
