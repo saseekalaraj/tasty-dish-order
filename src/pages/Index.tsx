@@ -51,8 +51,8 @@ const Index = () => {
             {/* Promo Carousel */}
             <PromoCarousel />
             
-            {/* Mobile Category Menu */}
-            <div className="lg:hidden">
+            {/* Category Menu */}
+            <div className="w-full">
               <CategoryMenu 
                 activeCategory={activeCategory} 
                 setActiveCategory={setActiveCategory} 
@@ -60,7 +60,7 @@ const Index = () => {
             </div>
             
             {/* Popular Items */}
-            <section className="mb-10">
+            <section className="mb-10 mt-6">
               <h2 className="text-2xl font-bold mb-6">Popular Items</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {popularItems.slice(0, 4).map(item => (
