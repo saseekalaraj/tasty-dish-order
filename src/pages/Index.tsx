@@ -14,6 +14,9 @@ const Index = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [filteredItems, setFilteredItems] = useState(menuItems);
+  const [popularItems, setPopularItems] = useState(() => 
+    menuItems.filter(item => item.popular)
+  );
 
   const toggleCart = () => setIsCartOpen(!isCartOpen);
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -23,14 +26,14 @@ const Index = () => {
     console.log("Active category changed to:", activeCategory);
     if (activeCategory === "all") {
       setFilteredItems(menuItems);
+      setPopularItems(menuItems.filter(item => item.popular));
     } else {
       const filtered = menuItems.filter(item => item.category === activeCategory);
       setFilteredItems(filtered);
+      // Also filter popular items by the selected category
+      setPopularItems(menuItems.filter(item => item.popular && item.category === activeCategory));
     }
   }, [activeCategory]);
-
-  // Get popular items for the featured section
-  const popularItems = menuItems.filter(item => item.popular);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -67,14 +70,16 @@ const Index = () => {
             </div>
             
             {/* Popular Items */}
-            <section className="mb-10 mt-6">
-              <h2 className="text-2xl font-bold mb-6">Popular Items</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {popularItems.slice(0, 4).map(item => (
-                  <MenuItemCard key={item.id} item={item} />
-                ))}
-              </div>
-            </section>
+            {popularItems.length > 0 && (
+              <section className="mb-10 mt-6">
+                <h2 className="text-2xl font-bold mb-6">Popular Items</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {popularItems.slice(0, 4).map(item => (
+                    <MenuItemCard key={item.id} item={item} />
+                  ))}
+                </div>
+              </section>
+            )}
             
             {/* Menu Items */}
             <section>
