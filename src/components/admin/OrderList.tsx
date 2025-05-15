@@ -76,13 +76,10 @@ const OrderList = () => {
   };
 
   const getAvailableActions = (status: OrderStatus, role: UserRole) => {
-    // Fix the type comparison by using a type guard approach
-    
-    // Create a function to check the role type safely
-    const hasRole = (checkRole: UserRole): boolean => role === checkRole;
+    // Fix the type comparison by using a string equality approach
     
     // For kitchen staff
-    if (hasRole("kitchen_staff")) {
+    if (role === "kitchen_staff") {
       if (status === "pending") {
         return <Button size="sm" onClick={() => handleStatusUpdate(mockOrders.find(o => o.status === status)?.id || "", "preparing")}>Start Preparing</Button>;
       }
@@ -92,14 +89,14 @@ const OrderList = () => {
     }
     
     // For waiters
-    if (hasRole("waiter")) {
+    if (role === "waiter") {
       if (status === "ready") {
         return <Button size="sm" onClick={() => handleStatusUpdate(mockOrders.find(o => o.status === status)?.id || "", "completed")}>Deliver Order</Button>;
       }
     }
     
     // For admins
-    if (hasRole("super_admin")) {
+    if (role === "super_admin") {
       if (status !== "completed") {
         return <Button size="sm">Update Status</Button>;
       }
