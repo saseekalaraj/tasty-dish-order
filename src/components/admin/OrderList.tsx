@@ -10,34 +10,39 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
+
+// Define proper types for our component
+type OrderStatus = "pending" | "preparing" | "ready" | "completed";
+type UserRole = "super_admin" | "kitchen_staff" | "waiter";
 
 // Mock data for orders
 const mockOrders = [
   {
     id: "ORD-001",
     items: ["Grilled Chicken Sandwich", "Fries", "Soda"],
-    status: "pending", // pending, preparing, ready, completed
+    status: "pending" as OrderStatus,
     total: "$24.99",
     time: "10:30 AM"
   },
   {
     id: "ORD-002",
     items: ["Caesar Salad", "Iced Tea"],
-    status: "preparing",
+    status: "preparing" as OrderStatus,
     total: "$15.50",
     time: "10:45 AM"
   },
   {
     id: "ORD-003",
     items: ["Cheeseburger", "Onion Rings", "Milkshake"],
-    status: "ready",
+    status: "ready" as OrderStatus,
     total: "$28.75",
     time: "11:00 AM"
   },
   {
     id: "ORD-004",
     items: ["Margherita Pizza", "Garlic Bread", "Coke"],
-    status: "completed",
+    status: "completed" as OrderStatus,
     total: "$32.00",
     time: "11:15 AM"
   }
@@ -45,9 +50,9 @@ const mockOrders = [
 
 const OrderList = () => {
   // This would be replaced with a real user role check
-  const userRole = "super_admin"; // Options: super_admin, kitchen_staff, waiter
+  const userRole: UserRole = "super_admin"; // Options: super_admin, kitchen_staff, waiter
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case "pending":
         return <Badge variant="outline">Pending</Badge>;
@@ -62,19 +67,27 @@ const OrderList = () => {
     }
   };
 
-  const getAvailableActions = (status: string, role: string) => {
+  const handleStatusUpdate = (orderId: string, newStatus: OrderStatus) => {
+    // This would be replaced with a real API call
+    toast({
+      title: "Order Status Updated",
+      description: `Order ${orderId} has been updated to ${newStatus}`,
+    });
+  };
+
+  const getAvailableActions = (status: OrderStatus, role: UserRole) => {
     if (role === "kitchen_staff") {
       if (status === "pending") {
-        return <Button size="sm">Start Preparing</Button>;
+        return <Button size="sm" onClick={() => handleStatusUpdate(mockOrders.find(o => o.status === status)?.id || "", "preparing")}>Start Preparing</Button>;
       }
       if (status === "preparing") {
-        return <Button size="sm">Mark Ready</Button>;
+        return <Button size="sm" onClick={() => handleStatusUpdate(mockOrders.find(o => o.status === status)?.id || "", "ready")}>Mark Ready</Button>;
       }
     }
     
     if (role === "waiter") {
       if (status === "ready") {
-        return <Button size="sm">Deliver Order</Button>;
+        return <Button size="sm" onClick={() => handleStatusUpdate(mockOrders.find(o => o.status === status)?.id || "", "completed")}>Deliver Order</Button>;
       }
     }
     
@@ -116,11 +129,11 @@ const OrderList = () => {
             <TableRow key={order.id}>
               <TableCell className="font-medium">{order.id}</TableCell>
               <TableCell>{order.items.join(", ")}</TableCell>
-              <TableCell>{getStatusBadge(order.status)}</TableCell>
+              <TableCell>{getStatusBadge(order.status as OrderStatus)}</TableCell>
               <TableCell>{order.total}</TableCell>
               <TableCell>{order.time}</TableCell>
               <TableCell>
-                {getAvailableActions(order.status, userRole)}
+                {getAvailableActions(order.status as OrderStatus, userRole)}
               </TableCell>
             </TableRow>
           ))}
