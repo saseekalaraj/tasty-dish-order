@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { 
@@ -14,7 +13,7 @@ import {
   SidebarSeparator
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Package, Users, ChefHat, Settings, Utensils, Category, User } from "lucide-react";
+import { Package, Users, ChefHat, Settings, Utensils, FolderTree, User } from "lucide-react";
 import OrderList from "@/components/admin/OrderList";
 import UserManagement from "@/components/admin/UserManagement";
 import MenuManagement from "@/components/admin/MenuManagement";
@@ -104,7 +103,7 @@ export default function Admin() {
                         onClick={() => setActiveView("categories")}
                         isActive={activeView === "categories"}
                       >
-                        <Category />
+                        <FolderTree />
                         <span>Categories</span>
                       </SidebarMenuButton>
                     </SidebarMenuItem>

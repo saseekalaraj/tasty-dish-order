@@ -56,7 +56,7 @@ const OrderList = () => {
       case "ready":
         return <Badge variant="default">Ready</Badge>;
       case "completed":
-        return <Badge variant="success" className="bg-green-500 text-white">Completed</Badge>;
+        return <Badge className="bg-green-500 text-white">Completed</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
