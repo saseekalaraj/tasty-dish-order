@@ -76,11 +76,13 @@ const OrderList = () => {
   };
 
   const getAvailableActions = (status: OrderStatus, role: UserRole) => {
-    // The issue is here - we need to use type guards instead of direct comparison
-    // for the UserRole type
+    // Fix the type comparison by using a type guard approach
+    
+    // Create a function to check the role type safely
+    const hasRole = (checkRole: UserRole): boolean => role === checkRole;
     
     // For kitchen staff
-    if (role === "kitchen_staff") {
+    if (hasRole("kitchen_staff")) {
       if (status === "pending") {
         return <Button size="sm" onClick={() => handleStatusUpdate(mockOrders.find(o => o.status === status)?.id || "", "preparing")}>Start Preparing</Button>;
       }
@@ -90,14 +92,14 @@ const OrderList = () => {
     }
     
     // For waiters
-    if (role === "waiter") {
+    if (hasRole("waiter")) {
       if (status === "ready") {
         return <Button size="sm" onClick={() => handleStatusUpdate(mockOrders.find(o => o.status === status)?.id || "", "completed")}>Deliver Order</Button>;
       }
     }
     
     // For admins
-    if (role === "super_admin") {
+    if (hasRole("super_admin")) {
       if (status !== "completed") {
         return <Button size="sm">Update Status</Button>;
       }
