@@ -2,6 +2,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { OrderStatus, UserRole, Order } from "@/types";
+import React from "react";
 
 // Format order status as a badge with appropriate styling
 export const getStatusBadge = (status: OrderStatus) => {
