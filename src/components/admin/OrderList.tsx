@@ -13,19 +13,6 @@ import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Order, OrderStatus, UserRole } from "@/types";
 
-// Define proper types for our component
-type OrderStatus = "pending" | "preparing" | "ready" | "completed";
-type UserRole = "super_admin" | "kitchen_staff" | "waiter";
-
-// Define type for our orders
-interface Order {
-  id: string;
-  items: string[];
-  status: OrderStatus;
-  total: string;
-  time: string;
-}
-
 const OrderList = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
