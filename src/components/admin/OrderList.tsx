@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { 
   Table, 
@@ -12,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { Order, OrderStatus, UserRole } from "@/types";
 
 // Define proper types for our component
 type OrderStatus = "pending" | "preparing" | "ready" | "completed";
@@ -29,8 +29,8 @@ interface Order {
 const OrderList = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  // This would be replaced with a real user role check from authentication
-  const userRole: UserRole = "super_admin"; // Options: super_admin, kitchen_staff, waiter
+  // Changed to type assertion instead of type declaration
+  const userRole = "super_admin" as UserRole; // Options: super_admin, kitchen_staff, waiter
 
   useEffect(() => {
     // Fetch orders from Supabase
