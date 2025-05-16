@@ -2,11 +2,10 @@
 import React from "react";
 import OrderTable from "./OrderTable";
 import { useOrders } from "@/hooks/useOrders";
-import { UserRole } from "@/types";
+import { useAuth } from "@/hooks/useAuth";
 
 const OrderList = () => {
-  // Changed to type assertion instead of type declaration
-  const userRole = "super_admin" as UserRole; // Options: super_admin, kitchen_staff, waiter
+  const { userRole } = useAuth();
   const { orders, loading, handleStatusUpdate } = useOrders();
 
   return (
@@ -27,7 +26,7 @@ const OrderList = () => {
       ) : (
         <OrderTable 
           orders={orders} 
-          userRole={userRole} 
+          userRole={userRole!} 
           handleStatusUpdate={handleStatusUpdate} 
         />
       )}

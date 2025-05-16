@@ -2,20 +2,61 @@
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { Order, OrderStatus } from "@/types";
-import { mockOrders } from "@/data/mockOrders";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useOrders = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    // Fetch orders from Supabase
-    const fetchOrders = async () => {
+  // Fetch orders from Supabase
+  const { data: orders = [], isLoading } = useQuery({
+    queryKey: ['orders'],
+    queryFn: async () => {
       try {
-        setLoading(true);
-        // This would be replaced with a real API call to Supabase
-        // For now, we'll use mockOrders as we haven't created the orders table yet
-        setOrders(mockOrders);
+        const { data, error } = await supabase
+          .from('orders')
+          .select(`
+            id, 
+            user_id, 
+            status, 
+            total, 
+            created_at, 
+            updated_at,
+            order_items (
+              id, 
+              order_id, 
+              menu_item_id, 
+              name, 
+              price, 
+              quantity
+            )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          throw error;
+        }
+
+        // Transform data to match our Order type
+        const transformedOrders: Order[] = data.map(order => ({
+          id: order.id,
+          user_id: order.user_id,
+          status: order.status as OrderStatus,
+          total: order.total,
+          created_at: order.created_at,
+          updated_at: order.updated_at,
+          items: order.order_items.map(item => ({
+            id: item.id,
+            order_id: item.order_id,
+            menu_item_id: item.menu_item_id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          }))
+        }));
+
+        return transformedOrders;
       } catch (error) {
         console.error("Error fetching orders:", error);
         toast({
@@ -23,27 +64,30 @@ export const useOrders = () => {
           description: "Failed to fetch orders. Please try again.",
           variant: "destructive",
         });
-      } finally {
-        setLoading(false);
+        return [];
       }
-    };
+    }
+  });
 
-    fetchOrders();
-  }, []);
+  // Update order status mutation
+  const updateOrderStatusMutation = useMutation({
+    mutationFn: async ({ orderId, newStatus }: { orderId: string; newStatus: OrderStatus }) => {
+      const { data, error } = await supabase
+        .from('orders')
+        .update({ status: newStatus, updated_at: new Date().toISOString() })
+        .eq('id', orderId)
+        .select();
 
-  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
-    try {
-      // This would be replaced with a real API call to update the status in Supabase
-      // For now, we'll just update the local state
-      setOrders(orders.map(order => 
-        order.id === orderId ? { ...order, status: newStatus } : order
-      ));
-
-      toast({
-        title: "Order Status Updated",
-        description: `Order ${orderId} has been updated to ${newStatus}`,
-      });
-    } catch (error) {
+      if (error) {
+        throw error;
+      }
+      return data;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch orders query when an order is updated
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+    onError: (error) => {
       console.error("Error updating order status:", error);
       toast({
         title: "Error",
@@ -51,7 +95,24 @@ export const useOrders = () => {
         variant: "destructive",
       });
     }
+  });
+
+  const handleStatusUpdate = async (orderId: string, newStatus: OrderStatus) => {
+    try {
+      await updateOrderStatusMutation.mutateAsync({ orderId, newStatus });
+      
+      toast({
+        title: "Order Status Updated",
+        description: `Order ${orderId} has been updated to ${newStatus}`,
+      });
+    } catch (error) {
+      // Error is already handled in the mutation
+    }
   };
 
-  return { orders, loading, handleStatusUpdate };
+  return { 
+    orders, 
+    loading: isLoading, 
+    handleStatusUpdate 
+  };
 };

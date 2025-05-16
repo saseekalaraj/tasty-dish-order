@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { 
   Sidebar, 
@@ -19,23 +20,26 @@ import UserManagement from "@/components/admin/UserManagement";
 import MenuManagement from "@/components/admin/MenuManagement";
 import CategoryManagement from "@/components/admin/CategoryManagement";
 import Dashboard from "@/components/admin/Dashboard";
-
-// Mock authentication - would be replaced with real auth
-const mockUser = {
-  id: "1",
-  name: "Admin User",
-  role: "super_admin", // Options: super_admin, kitchen_staff, waiter
-  avatar: "https://images.unsplash.com/photo-1500673922987-e212871fec22"
-};
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Admin() {
   const navigate = useNavigate();
   const [activeView, setActiveView] = useState("dashboard");
+  const { user, userRole, loading, signOut } = useAuth();
   
-  // Mock authentication check
-  const isAuthenticated = true;
-  if (!isAuthenticated) {
+  // Redirect to signin if not authenticated
+  if (!loading && !user) {
     return <Navigate to="/signin" replace />;
+  }
+  
+  // Show loading state while checking authentication
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+  
+  // Redirect non-staff members to home
+  if (user && !userRole) {
+    return <Navigate to="/" replace />;
   }
 
   const renderContent = () => {
@@ -55,7 +59,12 @@ export default function Admin() {
     }
   };
 
-  const canAccessUsers = mockUser.role === "super_admin";
+  const canAccessUsers = userRole === "super_admin";
+  
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/signin");
+  };
   
   return (
     <SidebarProvider>
@@ -96,7 +105,7 @@ export default function Admin() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 
-                {mockUser.role === "super_admin" && (
+                {userRole === "super_admin" && (
                   <>
                     <SidebarMenuItem>
                       <SidebarMenuButton 
@@ -143,16 +152,16 @@ export default function Admin() {
                     <User className="h-4 w-4 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{mockUser.name}</p>
+                    <p className="text-sm font-medium">{user.email}</p>
                     <p className="text-xs text-muted-foreground capitalize">
-                      {mockUser.role.replace("_", " ")}
+                      {userRole?.replace("_", " ")}
                     </p>
                   </div>
                 </div>
                 <Button 
                   variant="ghost" 
                   size="icon"
-                  onClick={() => navigate("/")}
+                  onClick={handleLogout}
                 >
                   <Settings className="h-4 w-4" />
                 </Button>

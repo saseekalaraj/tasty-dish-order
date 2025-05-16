@@ -6,6 +6,7 @@ import { ScrollArea } from "./ui/scroll-area";
 import { Separator } from "./ui/separator";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useCheckout } from "@/hooks/useCheckout";
 
 interface CheckoutConfirmationProps {
   onBack: () => void;
@@ -14,30 +15,25 @@ interface CheckoutConfirmationProps {
 
 const CheckoutConfirmation = ({ onBack, onComplete }: CheckoutConfirmationProps) => {
   const { cartItems, cartTotal, clearCart } = useCart();
-  const [isProcessing, setIsProcessing] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const { loading: isProcessing, processOrder } = useCheckout();
   
   const taxRate = 0.1; // 10% tax
   const tax = cartTotal * taxRate;
   const orderTotal = cartTotal + tax;
 
-  const handlePlaceOrder = () => {
-    setIsProcessing(true);
+  const handlePlaceOrder = async () => {
+    const orderId = await processOrder(cartItems, orderTotal);
     
-    // Simulate order processing
-    setTimeout(() => {
-      setIsProcessing(false);
+    if (orderId) {
       setIsCompleted(true);
-      
-      // Show success message
-      toast.success("Order placed successfully!");
       
       // Reset order after showing confirmation
       setTimeout(() => {
         clearCart();
         onComplete();
       }, 2000);
-    }, 1500);
+    }
   };
 
   if (isCompleted) {
